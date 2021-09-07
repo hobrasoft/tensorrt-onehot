@@ -237,26 +237,26 @@ int OneHotLayer::enqueue(const PluginTensorDesc* inputDesc, const PluginTensorDe
     switch (inputDesc[2].type) {
         case DataType::kFLOAT:  {
             int32_t lIndex;
-            float lOutput[36];
+            float lOutput[DEPTH];
             computeOneHot((const int32_t *)inputs[0], (const int32_t *)inputs[1], (const float *)inputs[2], (float *)outputs[0], stream); 
             cudaMemcpy(&lIndex,  inputs[1],  sizeof(int32_t), cudaMemcpyDeviceToHost);
-            cudaMemcpy(&lOutput, outputs[0], sizeof(float)*36, cudaMemcpyDeviceToHost);
+            cudaMemcpy(&lOutput, outputs[0], sizeof(float)*DEPTH, cudaMemcpyDeviceToHost);
             /*
             std::cout << "    ";
-            for (int i=0; i<36; i++) { std::cout << ((lOutput[i] < 0.5) ? "." : "0"); }
+            for (int i=0; i<DEPTH; i++) { std::cout << ((lOutput[i] < 0.5) ? "." : "0"); }
             std::cout << std::endl;
             */
             break;
             }
         case DataType::kHALF: {
             int32_t lIndex;
-            half lOutput[36];
+            half lOutput[DEPTH];
             computeOneHot((const int32_t *)inputs[0], (const int32_t *)inputs[1], (const half *)inputs[2], (half *)outputs[0], stream); 
             cudaMemcpy(&lIndex,  inputs[1],  sizeof(int32_t), cudaMemcpyDeviceToHost);
-            cudaMemcpy(&lOutput, outputs[0], sizeof(half)*36, cudaMemcpyDeviceToHost);
+            cudaMemcpy(&lOutput, outputs[0], sizeof(half)*DEPTH, cudaMemcpyDeviceToHost);
             /*
             std::cout << "    ";
-            for (int i=0; i<36; i++) { std::cout << ((lOutput[i] < 0.5) ? "." : "0"); }
+            for (int i=0; i<DEPTH; i++) { std::cout << ((lOutput[i] < 0.5) ? "." : "0"); }
             std::cout << std::endl;
             */
             break;
@@ -290,10 +290,10 @@ size_t OneHotLayer::getWorkspaceSize(const PluginTensorDesc* inputDesc, int32_t 
     ASSERT(nbInputs == 3);
     switch (inputDesc[2].type) {
         case DataType::kFLOAT:  
-            size = 36*sizeof(float);
+            size = DEPTH*sizeof(float);
             break;
         case DataType::kHALF:   
-            size = 36*sizeof(half);
+            size = DEPTH*sizeof(half);
             break;
         default: 
             std::cout << "Unsupported data type in getWorkspaceSize() " << toString(inputDesc[2].type) << std::endl;
